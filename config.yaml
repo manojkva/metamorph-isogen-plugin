@@ -11,6 +11,7 @@ controller:
 logger:
     apipath: /tmp/metamorph_api.log
     controllerpath: /tmp/metamorph_controller.log
+    pluginpath: /tmp/isogen-plugin.log
 
 templates:
     rootdir: /root/go/src/github.com/manojkva/metamorph-isogen-plugin
@@ -42,12 +43,12 @@ assets:
           dest: metamorph_agent
 
 iso:
-  rootpath: /tmp/iso_root
-  tempdir: /tmp/iso_root/isos
+  rootpath: /media/sf_Downloads/iso_root
+  tempdir: /media/sf_Downloads/iso_root/isos
 
 
 http:
-  rootpath: /tmp/http_root
+  rootpath: /media/sf_Downloads/http_root
 
 provisioning:
     ip : "12.168.220.23"

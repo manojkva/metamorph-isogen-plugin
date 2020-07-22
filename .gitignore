@@ -1,4 +1,5 @@
 # Binaries for programs and plugins
+metamorph-isogen-plugin
 *.exe
 *.exe~
 *.dll
