@@ -6,23 +6,32 @@ import (
 	"os/exec"
 	"testing"
 
-        hclog "github.com/hashicorp/go-hclog"
+	hclog "github.com/hashicorp/go-hclog"
 
+	"encoding/base64"
 	"github.com/hashicorp/go-plugin"
 	"github.com/manojkva/metamorph-plugin/plugins/isogen"
+	"io/ioutil"
 )
 
 func TestClientRequest(t *testing.T) {
+	data, err := ioutil.ReadFile("../examples/isogen.json")
+	if err != nil {
+		fmt.Printf("Could not read input config file\n")
+		os.Exit(1)
+	}
+	inputConfig := base64.StdEncoding.EncodeToString(data)
+
 	logger := hclog.New(&hclog.LoggerOptions{
-		  Name: "plugin",
-		  Output: os.Stdout,
-		  Level: hclog.Debug,})
+		Name:   "plugin",
+		Output: os.Stdout,
+		Level:  hclog.Debug})
 	client := plugin.NewClient(&plugin.ClientConfig{
 		HandshakeConfig:  isogen.Handshake,
 		Plugins:          isogen.PluginMap,
-		Cmd:              exec.Command("sh", "-c", "../metamorph-isogen-plugin 14fdcb0c-b061-4506-8453-7a7a1c881579"),
+		Cmd:              exec.Command("sh", "-c", "../metamorph-isogen-plugin "+string(inputConfig)),
 		AllowedProtocols: []plugin.Protocol{plugin.ProtocolGRPC},
-	        Logger: logger,})
+		Logger:           logger})
 	defer client.Kill()
 
 	rpcClient, err := client.Client()
@@ -39,10 +48,10 @@ func TestClientRequest(t *testing.T) {
 
 	}
 	service := raw.(isogen.ISOgen)
-  err = service.CreateISO()
-  if err  != nil{
-       fmt.Printf("Erro %v\n", err)
-  }else{
-	fmt.Printf("Successfull ISO Creation")
-  }
+	err = service.CreateISO()
+	if err != nil {
+		fmt.Printf("Erro %v\n", err)
+	} else {
+		fmt.Printf("Successfull ISO Creation")
+	}
 }

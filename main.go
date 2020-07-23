@@ -1,13 +1,13 @@
 package main
 
 import (
-        config "github.com/bm-metamorph/MetaMorph/pkg/config"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
+	config "github.com/bm-metamorph/MetaMorph/pkg/config"
 	"github.com/hashicorp/go-plugin"
-	"github.com/manojkva/metamorph-plugin/plugins/isogen"
 	driver "github.com/manojkva/metamorph-isogen-plugin/pkg/isogen"
+	"github.com/manojkva/metamorph-plugin/plugins/isogen"
 	"os"
 )
 
@@ -17,31 +17,26 @@ func main() {
 		fmt.Println("Usage metamorph-isogen-plugin <uuid>")
 		os.Exit(1)
 	}
-	uuid := os.Args[1]
-
+	data := os.Args[1]
 
 	var bmhnode driver.BMHNode
 
-	old  :=  os.Stdout
+	inputConfig, err := base64.StdEncoding.DecodeString(data)
 
-	//discard stdout as Server issues errors on any unfamiliar output on stdout
-
-	os.Stdout,_ = os.Open(os.DevNull)
-
-	data, err := node.Describe(uuid)
-
-	if err == nil {
-
-		err = json.Unmarshal(data, &bmhnode)
-	}
-	// Reassign stdout back
-	os.Stdout = old
 	if err != nil {
-
-		fmt.Printf("Failed to locate node in DB for uuid %v\n", uuid)
+		fmt.Printf("Failed to decode input config %v\n", data)
+		fmt.Printf("Error %v\n", err)
 		os.Exit(1)
 	}
-	//Get node details from db
+
+	err = json.Unmarshal([]byte(inputConfig), &bmhnode)
+	if err != nil {
+
+		fmt.Printf("Failed to decode input config %v\n", inputConfig)
+		fmt.Printf("Error %v\n", err)
+		os.Exit(1)
+	}
+
 	plugin.Serve(&plugin.ServeConfig{
 		HandshakeConfig: isogen.Handshake,
 		Plugins: map[string]plugin.Plugin{
