@@ -7,7 +7,7 @@ import (
 	config "github.com/bm-metamorph/MetaMorph/pkg/config"
 	"github.com/hashicorp/go-plugin"
 	driver "github.com/manojkva/metamorph-isogen-plugin/pkg/isogen"
-	"github.com/manojkva/metamorph-plugin/plugins/isogen"
+	"github.com/manojkva/metamorph-plugin/common/isogen"
 	"os"
 )
 
@@ -40,6 +40,6 @@ func main() {
 	plugin.Serve(&plugin.ServeConfig{
 		HandshakeConfig: isogen.Handshake,
 		Plugins: map[string]plugin.Plugin{
-			"isogen": &isogen.ISOgenPlugin{Impl: &bmhnode}},
+			"metamorph-isogen-plugin": &isogen.ISOgenPlugin{Impl: &bmhnode}},
 		GRPCServer: plugin.DefaultGRPCServer})
 }

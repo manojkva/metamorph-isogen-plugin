@@ -10,7 +10,7 @@ import (
 
 	"encoding/base64"
 	"github.com/hashicorp/go-plugin"
-	"github.com/manojkva/metamorph-plugin/plugins/isogen"
+	"github.com/manojkva/metamorph-plugin/common/isogen"
 	"io/ioutil"
 )
 
@@ -28,7 +28,7 @@ func TestClientRequest(t *testing.T) {
 		Level:  hclog.Debug})
 	client := plugin.NewClient(&plugin.ClientConfig{
 		HandshakeConfig:  isogen.Handshake,
-		Plugins:          isogen.PluginMap,
+		Plugins: map[string]plugin.Plugin{ "metamorph-isogen-plugin": &isogen.ISOgenPlugin{}},
 		Cmd:              exec.Command("sh", "-c", "../metamorph-isogen-plugin "+string(inputConfig)),
 		AllowedProtocols: []plugin.Protocol{plugin.ProtocolGRPC},
 		Logger:           logger})
@@ -41,7 +41,7 @@ func TestClientRequest(t *testing.T) {
 		os.Exit(1)
 	}
 
-	raw, err := rpcClient.Dispense("isogen")
+	raw, err := rpcClient.Dispense("metamorph-isogen-plugin")
 	if err != nil {
 		fmt.Printf("Error %v\n", err)
 		os.Exit(1)
