@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	config "github.com/bm-metamorph/MetaMorph/pkg/config"
+	config "github.com/manojkva/metamorph-plugin/pkg/config"
 	"github.com/hashicorp/go-plugin"
 	driver "github.com/manojkva/metamorph-isogen-plugin/pkg/isogen"
 	"github.com/manojkva/metamorph-plugin/common/isogen"

@@ -8,21 +8,6 @@ import (
  ///   "errors"
 )
 
-var tests_urldownload = map[string]struct {
-    urlpath  string
-    downldpath string
-    err    error
-}{
-     "successfull download": { 
-	   urlpath :"http://dl-cdn.alpinelinux.org/alpine/v3.11/releases/x86_64/alpine-standard-3.11.5-x86_64.iso",
-	   downldpath : "/tmp/alpine.iso",
-	   err:    nil, },
-    "invalid download": {
-        urlpath:  "http1://test.com",
-        downldpath: "/tmp/alpine2.iso", 
-        err:   &url.Error{},
-    },
-}
 
 var tests_extractcopy = map[string]struct {
     destpath  string
@@ -40,14 +25,6 @@ var tests_extractcopy = map[string]struct {
     },
 }
 
-func TestDownloadURL(t *testing.T){
-	
-    for testName, test := range tests_urldownload {
-        t.Logf("Running test case %s", testName)
-        err := DownloadUrl(test.downldpath, test.urlpath) 
-        assert.IsType(t, test.err, err)
-	}
-}
 
 func TestExtractAndCopyISO(t *testing.T){
     for testName, test := range tests_extractcopy {
