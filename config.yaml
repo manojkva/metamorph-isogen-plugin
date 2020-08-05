@@ -6,7 +6,9 @@ controller:
 logger:
     apipath: /tmp/metamorph_api.log
     controllerpath: /tmp/metamorph_controller.log
-    pluginpath: /tmp/isogen-plugin.log
+    plugins:
+      redfishpluginpath: /tmp/redfish-plugin.log
+      isogenpluginpath: /tmp/isogen-plugin.log
 
 templates:
     rootdir: /root/go/src/github.com/manojkva/metamorph-isogen-plugin

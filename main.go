@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	config.SetLoggerConfig("logger.pluginpath")
+	config.SetLoggerConfig("logger.plugins.isogenpluginpath")
 	if len(os.Args) != 2 {
 		fmt.Println("Usage metamorph-isogen-plugin <uuid>")
 		os.Exit(1)

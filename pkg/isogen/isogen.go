@@ -15,6 +15,7 @@ import (
 	"strings"
 
 	config "github.com/manojkva/metamorph-plugin/pkg/config"
+	"github.com/manojkva/metamorph-plugin/pkg/util"
 	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
 	"github.com/manojkva/metamorph-plugin/pkg/logger"
 	"go.uber.org/zap"
@@ -126,7 +127,7 @@ func (bmhnode *BMHNode) CreateISO() error {
                         logger.Log.Error(errMessage, zap.String("iso temp dir", iso_tempdir), zap.Error(err))
 			return fmt.Errorf(errMessage + " %+v", iso_tempdir, err)
 		}
-		err = DownloadUrl(iso_DownloadFullpath, iso_urlpath)
+		err = util.DownloadUrl(iso_DownloadFullpath, iso_urlpath)
 		if err != nil {
                         errMessage = "Failed to download ISO Image :" 
                         logger.Log.Error(errMessage, zap.Error(err))
