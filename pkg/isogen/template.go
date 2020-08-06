@@ -11,8 +11,10 @@ import (
         "io/ioutil"
 
 	config "github.com/manojkva/metamorph-plugin/pkg/config"
+	"github.com/manojkva/metamorph-plugin/pkg/logger"
 	"github.com/bm-metamorph/MetaMorph/pkg/db/models/node"
 	"encoding/base64"
+	"go.uber.org/zap"
 )
 
 type BMHNode struct {
@@ -20,12 +22,15 @@ type BMHNode struct {
 }
 
 func (bmhnode *BMHNode) CreateNetplanFileFromString(outputdir string, modulename string) error {
+	logger.Log.Info("CreateNetplanFileFromString()")
 	var networkConfig = bmhnode.NetworkConfig
 	if networkConfig == "" {
+		logger.Log.Error("NetworkConfig is empty")
 		return  fmt.Errorf("NetworkConfig is empty")
 	}
 	decodedStringInBytes, result := IsBase64(networkConfig)
 	if result != true{
+		logger.Log.Error("NetworkConfig is not Base64 encoded")
 		return fmt.Errorf("NetworkConfig is not Base64 encoded")
 	}
 
@@ -39,18 +44,22 @@ func (bmhnode *BMHNode) CreateNetplanFileFromString(outputdir string, modulename
 }
 
 func (bmhnode *BMHNode) CreateNetplanFileFromTemplate(outputdir string, modulename string) error {
+	logger.Log.Info("CreateNetplanFileFromTemplate()")
 	var err error
 	interfacelist, err := node.GetBondInterfaces(bmhnode.NodeUUID.String())
 	if err != nil {
+		logger.Log.Error("Failed to get Bond Interfaces", zap.Error(err))
 		return err
 	}
 	nameserverlist, err := node.GetNameServers(bmhnode.NodeUUID.String())
 	if err != nil {
+		logger.Log.Error("Feiled to get Name Server details", zap.Error(err))
 		return err
 	}
 
 	bondParameters,err := node.GetBondParameters(bmhnode.NodeUUID.String())
 	if err != nil {
+		logger.Log.Error("Failed to get Bond Parameters", zap.Error(err))
 		return err
 	}
 
@@ -67,6 +76,7 @@ func (bmhnode *BMHNode) CreateNetplanFileFromTemplate(outputdir string, modulena
 }
 
 func (bmhnode *BMHNode) CreatePressedFileFromTemplate(outputdir string, modulename string) error {
+	logger.Log.Info("CreatePressedFileFromTemplate()")
 
 	var err error
 
@@ -76,10 +86,11 @@ func (bmhnode *BMHNode) CreatePressedFileFromTemplate(outputdir string, modulena
 		for index,part := range partitionlist{
 			filesystem, err = node.GetFilesystem(part.ID)
 			if err != nil{
+				logger.Log.Error("Failed to get FileSystem Info from preseed template", zap.Error(err))
 				return err
 			}
 			partitionlist[index].Filesystem = *filesystem
-		} 
+		}
 		bmhnode.Partitions = partitionlist
 
 		err = bmhnode.CreateFileFromTemplate(outputdir, modulename)
@@ -87,10 +98,11 @@ func (bmhnode *BMHNode) CreatePressedFileFromTemplate(outputdir string, modulena
 	return err
 }
 func (bmhnode *BMHNode) CreateFileFromTemplate(outputdir string, modulename string) error {
+	logger.Log.Info("CreateFileFromTemplate()")
 
 	var err error
 
-	fmt.Println("Creating " + modulename + " from Template")
+	logger.Log.Debug(fmt.Sprintf("Creating " + modulename + " from Template"))
 
 	template_rootpath := config.Get("templates.rootdir").(string)
 
@@ -101,22 +113,23 @@ func (bmhnode *BMHNode) CreateFileFromTemplate(outputdir string, modulename stri
 	outputfilepathAbsolute := path.Join(outputdir, filepath)
 
 	if _, err = os.Stat(templatepathAbsolute); os.IsNotExist(err) {
-		fmt.Printf("Template file for "+modulename+"does not exist : %v\n", err)
+		logger.Log.Error(fmt.Sprintf("Template file for "+modulename+"does not exist : %v\n", err))
 		return err
 	}
 	if _, err = os.Stat(path.Dir(outputfilepathAbsolute)); os.IsNotExist(err) {
-		fmt.Printf("Output file directory for "+modulename+"does not exist : %v\n", err)
+		logger.Log.Error(fmt.Sprintf("Output file directory for "+modulename+"does not exist : %v\n", err))
 		return err
 	}
 	tmpl, err := template.ParseFiles(templatepathAbsolute)
 
 	if err != nil {
+		logger.Log.Error("Failed to Parse template file", zap.Error(err))
 		return err
 	}
 
 	f, err := os.Create(outputfilepathAbsolute)
 	if err != nil {
-		fmt.Printf("Failed to create file: %v\n", err)
+		logger.Log.Error(fmt.Sprintf("Failed to create file: %v\n", err))
 		return err
 	}
 
